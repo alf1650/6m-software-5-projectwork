@@ -96,9 +96,15 @@ function HomeScreen({ navigation }) {
       console.error("Calendar not found");
       return;
     }
-
+  
     try {
-      const eventId = await Calendar.createEventAsync(calendarId, tripDetails);
+      // Include the description as notes
+      const eventDetails = {
+        ...tripDetails,
+        notes: tripDetails.description, // Set the description as notes
+      };
+  
+      const eventId = await Calendar.createEventAsync(calendarId, eventDetails);
       console.log(`Event added to calendar with ID: ${eventId}`);
       setTripAdded(true);
       setTimeout(() => {
@@ -109,7 +115,7 @@ function HomeScreen({ navigation }) {
       Alert.alert("Error", "Failed to add event to calendar.");
     }
   };
-
+  
   const showStartDatePickerModal = () => {
     setShowStartDatePicker(true);
   };

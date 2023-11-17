@@ -20,7 +20,8 @@
     "react-native-camera": "^4.2.1",
     "react-native-permission": "^0.0.1",
     "expo-permissions": "~14.2.1",
-    "expo-camera": "~13.4.4"
+    "expo-camera": "~13.4.4",
+    "expo-image-picker": "~14.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
