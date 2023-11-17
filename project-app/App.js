@@ -5,7 +5,11 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Calendar from 'expo-calendar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { RNCamera } from 'react-native-camera'; // Import the RNCamera component
+// import { RNCamera } from 'react-native-camera'; // Import the RNCamera component
+// import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { Camera } from 'expo-camera';
+import * as Permissions from 'expo-permissions';
+
 
 const Tab = createBottomTabNavigator();
 
@@ -172,18 +176,69 @@ function HomeScreen({ navigation }) {
   );
 }
 
+// function CameraScreen() {
+//   return (
+//     <View style={styles.container}>
+//       {/* RNCamera component from react-native-camera */}
+//       <RNCamera
+//         style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
+//         type={RNCamera.Constants.Type.back}
+//         flashMode={RNCamera.Constants.FlashMode.on}
+//       />
+//     </View>
+//   );
+// }
+
+// function CameraScreen() {
+//   useEffect(() => {
+//     const checkCameraPermission = async () => {
+//       const result = await check(PERMISSIONS.IOS.CAMERA);
+
+//       if (result === RESULTS.DENIED) {
+//         const permissionResult = await request(PERMISSIONS.IOS.CAMERA);
+//         if (permissionResult !== RESULTS.GRANTED) {
+//           // Handle permission denial
+//           console.error('Camera permission denied');
+//         }
+//       }
+//     };
+
+//     checkCameraPermission();
+//   }, []);
+
+//   return (
+//     <View style={styles.container}>
+//       {/* RNCamera component from react-native-camera */}
+//       <RNCamera
+//         style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
+//         type={RNCamera.Constants.Type.back}
+//         flashMode={RNCamera.Constants.FlashMode.on}
+//       />
+//     </View>
+//   );
+// }
+
 function CameraScreen() {
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      const { status } = await Permissions.askAsync(Permissions.CAMERA);
+
+      if (status !== 'granted') {
+        console.error('Camera permission denied');
+      }
+    };
+
+    getCameraPermission();
+  }, []);
+
   return (
-    <View style={styles.container}>
-      {/* RNCamera component from react-native-camera */}
-      <RNCamera
-        style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'center' }}
-        type={RNCamera.Constants.Type.back}
-        flashMode={RNCamera.Constants.FlashMode.on}
-      />
+    <View style={{ flex: 1 }}>
+      {/* Expo Camera component */}
+      <Camera style={{ flex: 1 }} type={Camera.Constants.Type.back} />
     </View>
   );
 }
+
 
 export default function App() {
   return (
