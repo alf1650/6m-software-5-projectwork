@@ -1,29 +1,42 @@
-
-import React, { useState, useEffect } from 'react';
-import { View, Button, Text, TextInput, Platform, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Alert, StyleSheet, Modal } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import * as Calendar from 'expo-calendar';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Button,
+  Image,
+  Text,
+  TextInput,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Alert,
+  StyleSheet,
+  Modal,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import * as Calendar from "expo-calendar";
+import * as ImagePicker from "expo-image-picker";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 // import { RNCamera } from 'react-native-camera'; // Import the RNCamera component
 // import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
-import { Camera } from 'expo-camera';
-import * as Permissions from 'expo-permissions';
-
+import { Camera } from "expo-camera";
+import * as Permissions from "expo-permissions";
 
 const Tab = createBottomTabNavigator();
 
 function HomeScreen({ navigation }) {
   const [calendarId, setCalendarId] = useState(null);
   const [tripAdded, setTripAdded] = useState(false);
+  const [image, setImage] = useState(null);
   const [tripDetails, setTripDetails] = useState({
-    title: 'My Trip',
+    title: "My Trip",
     startDate: new Date(),
     endDate: new Date(),
     allDay: true,
-    location: 'Destination City',
-    description: 'Trip description',
-    timeZone: 'America/New_York',
+    location: "Destination City",
+    description: "Trip description",
+    timeZone: "America/New_York",
   });
 
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -32,8 +45,10 @@ function HomeScreen({ navigation }) {
   useEffect(() => {
     (async () => {
       const { status } = await Calendar.requestCalendarPermissionsAsync();
-      if (status === 'granted') {
-        const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+      if (status === "granted") {
+        const calendars = await Calendar.getCalendarsAsync(
+          Calendar.EntityTypes.EVENT
+        );
         setCalendarId(calendars[0].id);
       }
     })();
@@ -60,9 +75,25 @@ function HomeScreen({ navigation }) {
     });
   };
 
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   const addTripToCalendar = async () => {
     if (!calendarId) {
-      console.error('Calendar not found');
+      console.error("Calendar not found");
       return;
     }
 
@@ -74,8 +105,8 @@ function HomeScreen({ navigation }) {
         setTripAdded(false);
       }, 3000);
     } catch (error) {
-      console.error('Error adding event to calendar:', error);
-      Alert.alert('Error', 'Failed to add event to calendar.');
+      console.error("Error adding event to calendar:", error);
+      Alert.alert("Error", "Failed to add event to calendar.");
     }
   };
 
@@ -117,23 +148,30 @@ function HomeScreen({ navigation }) {
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
         <Text style={styles.label}>Title:</Text>
         <TextInput
           style={styles.input}
           onChangeText={handleTitleChange}
-          onFocus={(e) => e.target.placeholder = ''}
-          onBlur={(e) => e.target.placeholder = tripDetails.title || 'My Trip'}
-          placeholder={tripDetails.title || 'My Trip'}
+          onFocus={(e) => (e.target.placeholder = "")}
+          onBlur={(e) =>
+            (e.target.placeholder = tripDetails.title || "My Trip")
+          }
+          placeholder={tripDetails.title || "My Trip"}
         />
 
         <Text style={styles.label}>Location:</Text>
         <TextInput
           style={styles.input}
           onChangeText={handleLocationChange}
-          onFocus={(e) => e.target.placeholder = ''}
-          onBlur={(e) => e.target.placeholder = tripDetails.location || 'Destination City'}
-          placeholder={tripDetails.location || 'Destination City'}
+          onFocus={(e) => (e.target.placeholder = "")}
+          onBlur={(e) =>
+            (e.target.placeholder = tripDetails.location || "Destination City")
+          }
+          placeholder={tripDetails.location || "Destination City"}
         />
 
         <Text style={styles.label}>Description:</Text>
@@ -141,32 +179,61 @@ function HomeScreen({ navigation }) {
           style={[styles.input, styles.multilineInput]}
           multiline
           onChangeText={handleDescriptionChange}
-          onFocus={(e) => e.target.placeholder = ''}
-          onBlur={(e) => e.target.placeholder = tripDetails.description || 'Trip description'}
-          placeholder={tripDetails.description || 'Trip description'}
+          onFocus={(e) => (e.target.placeholder = "")}
+          onBlur={(e) =>
+            (e.target.placeholder =
+              tripDetails.description || "Trip description")
+          }
+          placeholder={tripDetails.description || "Trip description"}
+        />
+        <Button
+          style={styles.button}
+          title="Add Image for Itinerary"
+          onPress={pickImage}
         />
 
+        {image && <Image source={{ uri: image }} style={styles.image} />}
         <Button title="Add Trip to Calendar" onPress={addTripToCalendar} />
 
-        {tripAdded && <Text style={styles.successMessage}>Added to Calendar</Text>}
+        {tripAdded && (
+          <Text style={styles.successMessage}>Added to Calendar</Text>
+        )}
 
         <Button title="Select Start Date" onPress={showStartDatePickerModal} />
 
         <Button title="Select End Date" onPress={showEndDatePickerModal} />
 
-        <Modal visible={showStartDatePicker} animationType="slide" transparent={true}>
+        <Modal
+          visible={showStartDatePicker}
+          animationType="slide"
+          transparent={true}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <DateTimePicker value={tripDetails.startDate} mode="date" display="default" onChange={handleStartDateChange} />
+              <DateTimePicker
+                value={tripDetails.startDate}
+                mode="date"
+                display="default"
+                onChange={handleStartDateChange}
+              />
               <Button title="Close" onPress={hideStartDatePickerModal} />
             </View>
           </View>
         </Modal>
 
-        <Modal visible={showEndDatePicker} animationType="slide" transparent={true}>
+        <Modal
+          visible={showEndDatePicker}
+          animationType="slide"
+          transparent={true}
+        >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <DateTimePicker value={tripDetails.endDate} mode="date" display="default" onChange={handleEndDateChange} />
+              <DateTimePicker
+                value={tripDetails.endDate}
+                mode="date"
+                display="default"
+                onChange={handleEndDateChange}
+              />
               <Button title="Close" onPress={hideEndDatePickerModal} />
             </View>
           </View>
@@ -223,8 +290,8 @@ function CameraScreen() {
     const getCameraPermission = async () => {
       const { status } = await Permissions.askAsync(Permissions.CAMERA);
 
-      if (status !== 'granted') {
-        console.error('Camera permission denied');
+      if (status !== "granted") {
+        console.error("Camera permission denied");
       }
     };
 
@@ -238,7 +305,6 @@ function CameraScreen() {
     </View>
   );
 }
-
 
 export default function App() {
   return (
@@ -254,42 +320,45 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
+    width: "80%",
+    alignItems: "center",
   },
   label: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginVertical: 5,
+  },
+  button: {
+    marginVertical: 10,
   },
   input: {
     height: 40,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginVertical: 5,
     padding: 5,
-    width: '100%',
+    width: "100%",
   },
   multilineInput: {
     height: 80,
-    width: '100%',
+    width: "100%",
   },
   successMessage: {
-    color: 'green',
+    color: "green",
     marginTop: 10,
   },
 });
