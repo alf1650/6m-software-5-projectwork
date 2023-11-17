@@ -87,7 +87,7 @@ function HomeScreen({ navigation }) {
     console.log(result);
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setImage(result.uri);
     }
   };
 
@@ -96,14 +96,14 @@ function HomeScreen({ navigation }) {
       console.error("Calendar not found");
       return;
     }
-  
+
     try {
       // Include the description as notes
       const eventDetails = {
         ...tripDetails,
         notes: tripDetails.description, // Set the description as notes
       };
-  
+
       const eventId = await Calendar.createEventAsync(calendarId, eventDetails);
       console.log(`Event added to calendar with ID: ${eventId}`);
       setTripAdded(true);
@@ -115,7 +115,7 @@ function HomeScreen({ navigation }) {
       Alert.alert("Error", "Failed to add event to calendar.");
     }
   };
-  
+
   const showStartDatePickerModal = () => {
     setShowStartDatePicker(true);
   };
@@ -197,8 +197,8 @@ function HomeScreen({ navigation }) {
           title="Add Image for Itinerary"
           onPress={pickImage}
         />
-
         {image && <Image source={{ uri: image }} style={styles.image} />}
+
         <Button title="Add Trip to Calendar" onPress={addTripToCalendar} />
 
         {tripAdded && (
@@ -329,6 +329,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+  },
+  image: {
+    width: 200,
+    height: 200,
+    resizeMode: "cover",
+    marginVertical: 20,
   },
   modalContainer: {
     flex: 1,
