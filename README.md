@@ -6,3 +6,9 @@ npx expo install expo-calendar
 npx expo install @react-native-community/datetimepicker
 
 npx expo install @react-navigation/native
+
+npx expo install @react-navigation/bottom-tabs
+
+npx expo install expo-camera    
+
+npx expo install expo-permissions   
