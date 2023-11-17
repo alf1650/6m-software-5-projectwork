@@ -12,3 +12,5 @@ npx expo install @react-navigation/bottom-tabs
 npx expo install expo-camera    
 
 npx expo install expo-permissions   
+
+npx expo install expo-image-picker
